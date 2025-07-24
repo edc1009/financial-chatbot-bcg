@@ -4,7 +4,7 @@ A Python-based financial chatbot that answers predefined queries about Tesla, Ap
 
 ## 🚀 Live Demo
 
-**[Try the Standalone Version](https://your-username.github.io/financial-chatbot-bcg/chatbot_standalone.html)** - No installation required!
+**[Try the Standalone Version](https://edc1009.github.io/financial-chatbot-bcg/chatbot_standalone.html)** - No installation required!
 
 ## 📋 Project Overview
 
@@ -39,7 +39,7 @@ This financial chatbot provides intelligent responses to predefined queries abou
 ### Option 2: Python Environment
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/financial-chatbot-bcg.git
+   git clone https://github.com/edc1009/financial-chatbot-bcg.git
    cd financial-chatbot-bcg
    ```
 
@@ -158,7 +158,7 @@ Tesla's total revenue for 2022: $81,462,000,000
 ### GitHub Pages (Standalone Version)
 1. Enable GitHub Pages in repository settings
 2. Set source to main branch
-3. Access at: `https://your-username.github.io/financial-chatbot-bcg/chatbot_standalone.html`
+3. Access at: `https://edc1009.github.io/financial-chatbot-bcg/chatbot_standalone.html`
 
 ### Local Development Server
 ```bash
