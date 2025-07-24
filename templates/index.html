@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>財務聊天機器人</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .chat-container {
+            padding: 30px;
+        }
+        
+        .query-section {
+            margin-bottom: 30px;
+        }
+        
+        .query-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .query-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .query-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+        
+        .query-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .query-btn.active {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .input-section {
+            display: none;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .input-group select, .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .response-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #4facfe;
+            display: none;
+        }
+        
+        .response-section h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .response-text {
+            color: #555;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .info-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .info-section h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .info-list {
+            color: #333;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 財務聊天機器人</h1>
+            <p>查詢 Tesla、Apple、Microsoft 的財務資訊</p>
+        </div>
+        
+        <div class="chat-container">
+            <div class="query-section">
+                <h3>請選擇查詢類型：</h3>
+                <div class="query-buttons">
+                    {% for key, value in queries.items() %}
+                    <button class="query-btn" onclick="selectQuery('{{ key }}')">
+                        {{ value }}
+                    </button>
+                    {% endfor %}
+                </div>
+                
+                <div id="input-section" class="input-section">
+                    <div id="company-input" class="input-group" style="display: none;">
+                        <label for="company">選擇公司：</label>
+                        <select id="company" name="company">
+                            <option value="">請選擇公司</option>
+                            {% for company in companies %}
+                            <option value="{{ company }}">{{ company }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div id="year-input" class="input-group" style="display: none;">
+                        <label for="year">選擇年份：</label>
+                        <select id="year" name="year">
+                            <option value="">請選擇年份</option>
+                            {% for year in years %}
+                            <option value="{{ year }}">{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <button class="submit-btn" onclick="submitQuery()">查詢</button>
+                </div>
+            </div>
+            
+            <div id="response-section" class="response-section">
+                <h4>查詢結果：</h4>
+                <div id="response-text" class="response-text"></div>
+            </div>
+            
+            <div class="info-section">
+                <h4>📊 可用數據資訊：</h4>
+                <div class="info-list">
+                    <strong>公司：</strong> {{ companies | join(', ') }}<br>
+                    <strong>年份：</strong> {{ years | join(', ') }}<br>
+                    <strong>財務指標：</strong> 總營收、淨利、總資產、總負債、營運現金流
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuery = '';
+        
+        function selectQuery(queryType) {
+            // 重置所有按鈕
+            document.querySelectorAll('.query-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 設定當前選中的按鈕
+            event.target.classList.add('active');
+            currentQuery = queryType;
+            
+            // 顯示輸入區域
+            const inputSection = document.getElementById('input-section');
+            const companyInput = document.getElementById('company-input');
+            const yearInput = document.getElementById('year-input');
+            
+            inputSection.style.display = 'block';
+            
+            // 根據查詢類型顯示相應的輸入欄位
+            companyInput.style.display = 'none';
+            yearInput.style.display = 'none';
+            
+            switch(queryType) {
+                case 'revenue':
+                case 'profit_margin':
+                    companyInput.style.display = 'block';
+                    yearInput.style.display = 'block';
+                    break;
+                case 'income_change':
+                case 'cash_flow':
+                    companyInput.style.display = 'block';
+                    break;
+                case 'highest_revenue':
+                    yearInput.style.display = 'block';
+                    break;
+            }
+            
+            // 隱藏之前的回應
+            document.getElementById('response-section').style.display = 'none';
+        }
+        
+        function submitQuery() {
+            if (!currentQuery) {
+                alert('請先選擇查詢類型');
+                return;
+            }
+            
+            const company = document.getElementById('company').value;
+            const year = document.getElementById('year').value;
+            
+            // 顯示載入中
+            const responseSection = document.getElementById('response-section');
+            const responseText = document.getElementById('response-text');
+            
+            responseSection.style.display = 'block';
+            responseText.innerHTML = '<div class="loading">查詢中...</div>';
+            
+            // 發送查詢請求
+            fetch('/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query_type: currentQuery,
+                    company: company,
+                    year: year
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                responseText.innerHTML = data.response;
+            })
+            .catch(error => {
+                responseText.innerHTML = '查詢時發生錯誤: ' + error;
+            });
+        }
+    </script>
+</body>
+</html>

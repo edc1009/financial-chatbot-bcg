@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Chatbot - Standalone Version</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .query-section {
+            margin-bottom: 30px;
+        }
+
+        .query-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .query-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .query-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .query-btn.active {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .input-section {
+            display: none;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-section.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .input-group select, .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .query-submit-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .query-submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .result-section {
+            background: #e8f5e8;
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .result-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .result-content {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .data-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .data-info h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .data-info ul {
+            color: #856404;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💼 Financial Chatbot</h1>
+            <p>Query financial data for Tesla, Apple, and Microsoft</p>
+        </div>
+
+        <div class="content">
+            <div class="data-info">
+                <h3>📊 Available Data Range</h3>
+                <ul>
+                    <li><strong>Tesla:</strong> Financial data from 2020-2022</li>
+                    <li><strong>Apple:</strong> Financial data from 2020-2022</li>
+                    <li><strong>Microsoft:</strong> Financial data from 2021-2023</li>
+                </ul>
+            </div>
+
+            <div class="query-section">
+                <h2>Select Query Type:</h2>
+                <div class="query-buttons">
+                    <button class="query-btn" onclick="selectQuery('revenue')">
+                        📈 Query Company Revenue by Year
+                    </button>
+                    <button class="query-btn" onclick="selectQuery('netincome')">
+                        💰 Query Company Net Income Trend
+                    </button>
+                    <button class="query-btn" onclick="selectQuery('highest')">
+                        🏆 Query Highest Revenue Company by Year
+                    </button>
+                    <button class="query-btn" onclick="selectQuery('margin')">
+                        📊 Query Company Profit Margin
+                    </button>
+                    <button class="query-btn" onclick="selectQuery('cashflow')">
+                        💵 Query Company Cash Flow Trend
+                    </button>
+                </div>
+            </div>
+
+            <!-- Revenue Query -->
+            <div id="revenue-input" class="input-section">
+                <div class="input-group">
+                    <label>Select Company:</label>
+                    <select id="revenue-company">
+                        <option value="Tesla">Tesla</option>
+                        <option value="Apple">Apple</option>
+                        <option value="Microsoft">Microsoft</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Select Year:</label>
+                    <select id="revenue-year">
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                    </select>
+                </div>
+                <button class="query-submit-btn" onclick="queryRevenue()">Query Revenue</button>
+            </div>
+
+            <!-- Net Income Change Query -->
+            <div id="netincome-input" class="input-section">
+                <div class="input-group">
+                    <label>Select Company:</label>
+                    <select id="netincome-company">
+                        <option value="Tesla">Tesla</option>
+                        <option value="Apple">Apple</option>
+                        <option value="Microsoft">Microsoft</option>
+                    </select>
+                </div>
+                <button class="query-submit-btn" onclick="queryNetIncome()">Query Net Income Change</button>
+            </div>
+
+            <!-- Highest Revenue Query -->
+            <div id="highest-input" class="input-section">
+                <div class="input-group">
+                    <label>Select Year:</label>
+                    <select id="highest-year">
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                    </select>
+                </div>
+                <button class="query-submit-btn" onclick="queryHighest()">Query Highest Revenue</button>
+            </div>
+
+            <!-- Profit Margin Query -->
+            <div id="margin-input" class="input-section">
+                <div class="input-group">
+                    <label>Select Company:</label>
+                    <select id="margin-company">
+                        <option value="Tesla">Tesla</option>
+                        <option value="Apple">Apple</option>
+                        <option value="Microsoft">Microsoft</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Select Year:</label>
+                    <select id="margin-year">
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                    </select>
+                </div>
+                <button class="query-submit-btn" onclick="queryMargin()">Query Profit Margin</button>
+            </div>
+
+            <!-- Cash Flow Query -->
+            <div id="cashflow-input" class="input-section">
+                <div class="input-group">
+                    <label>Select Company:</label>
+                    <select id="cashflow-company">
+                        <option value="Tesla">Tesla</option>
+                        <option value="Apple">Apple</option>
+                        <option value="Microsoft">Microsoft</option>
+                    </select>
+                </div>
+                <button class="query-submit-btn" onclick="queryCashFlow()">Query Cash Flow</button>
+            </div>
+
+            <!-- Result Display Area -->
+            <div id="result" class="result-section">
+                <div class="result-title">Query Result:</div>
+                <div class="result-content" id="result-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Financial data (mock data based on original CSV)
+        const financialData = {
+            "Tesla": {
+                "2020": { revenue: 31536, netIncome: 721, totalAssets: 52148, totalLiabilities: 28748, cashFlow: 5943 },
+                "2021": { revenue: 53823, netIncome: 5519, totalAssets: 62131, totalLiabilities: 30548, cashFlow: 11497 },
+                "2022": { revenue: 81462, netIncome: 12556, totalAssets: 82338, totalLiabilities: 36440, cashFlow: 14724 }
+            },
+            "Apple": {
+                "2020": { revenue: 274515, netIncome: 57411, totalAssets: 323888, totalLiabilities: 258549, cashFlow: 80674 },
+                "2021": { revenue: 365817, netIncome: 94680, totalAssets: 351002, totalLiabilities: 287912, cashFlow: 104038 },
+                "2022": { revenue: 394328, netIncome: 99803, totalAssets: 352755, totalLiabilities: 302083, cashFlow: 122151 }
+            },
+            "Microsoft": {
+                "2021": { revenue: 168088, netIncome: 61271, totalAssets: 333779, totalLiabilities: 191791, cashFlow: 76740 },
+                "2022": { revenue: 198270, netIncome: 72361, totalAssets: 364840, totalLiabilities: 198298, cashFlow: 89035 },
+                "2023": { revenue: 211915, netIncome: 72361, totalAssets: 411976, totalLiabilities: 205753, cashFlow: 87582 }
+            }
+        };
+
+        function selectQuery(type) {
+            // Reset all buttons and input sections
+            document.querySelectorAll('.query-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.input-section').forEach(section => section.classList.remove('active'));
+            document.getElementById('result').classList.remove('active');
+
+            // Activate selected button and corresponding input section
+            event.target.classList.add('active');
+            document.getElementById(type + '-input').classList.add('active');
+        }
+
+        function showResult(content) {
+            document.getElementById('result-content').innerHTML = content;
+            document.getElementById('result').classList.add('active');
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+
+        function queryRevenue() {
+            const company = document.getElementById('revenue-company').value;
+            const year = document.getElementById('revenue-year').value;
+            
+            if (financialData[company] && financialData[company][year]) {
+                const revenue = financialData[company][year].revenue;
+                showResult(`<strong>${company}</strong> total revenue in <strong>${year}</strong>:<br><span style="font-size: 1.5em; color: #4caf50;">$${formatNumber(revenue)} million</span>`);
+            } else {
+                showResult(`Sorry, no revenue data found for ${company} in ${year}.`);
+            }
+        }
+
+        function queryNetIncome() {
+            const company = document.getElementById('netincome-company').value;
+            const years = Object.keys(financialData[company] || {}).sort();
+            
+            if (years.length >= 2) {
+                const latestYear = years[years.length - 1];
+                const previousYear = years[years.length - 2];
+                const latest = financialData[company][latestYear].netIncome;
+                const previous = financialData[company][previousYear].netIncome;
+                const change = ((latest - previous) / previous * 100).toFixed(2);
+                const changeAmount = latest - previous;
+                
+                showResult(`<strong>${company}</strong> Net Income Trend:<br>
+                    ${previousYear}: $${formatNumber(previous)} million<br>
+                    ${latestYear}: $${formatNumber(latest)} million<br>
+                    <span style="font-size: 1.2em; color: ${change >= 0 ? '#4caf50' : '#f44336'};">
+                        Change: ${change >= 0 ? '+' : ''}${change}% (${change >= 0 ? '+' : ''}$${formatNumber(changeAmount)} million)
+                    </span>`);
+            } else {
+                showResult(`Sorry, insufficient data for ${company} to calculate net income trend.`);
+            }
+        }
+
+        function queryHighest() {
+            const year = document.getElementById('highest-year').value;
+            let highest = { company: '', revenue: 0 };
+            
+            for (const company in financialData) {
+                if (financialData[company][year]) {
+                    const revenue = financialData[company][year].revenue;
+                    if (revenue > highest.revenue) {
+                        highest = { company, revenue };
+                    }
+                }
+            }
+            
+            if (highest.company) {
+                showResult(`Company with highest revenue in <strong>${year}</strong>:<br>
+                    <span style="font-size: 1.5em; color: #4caf50;"><strong>${highest.company}</strong></span><br>
+                    Revenue: $${formatNumber(highest.revenue)} million`);
+            } else {
+                showResult(`Sorry, no revenue data found for ${year}.`);
+            }
+        }
+
+        function queryMargin() {
+            const company = document.getElementById('margin-company').value;
+            const year = document.getElementById('margin-year').value;
+            
+            if (financialData[company] && financialData[company][year]) {
+                const data = financialData[company][year];
+                const margin = (data.netIncome / data.revenue * 100).toFixed(2);
+                showResult(`<strong>${company}</strong> profit margin in <strong>${year}</strong>:<br>
+                    <span style="font-size: 1.5em; color: #4caf50;">${margin}%</span><br>
+                    (Net Income: $${formatNumber(data.netIncome)} million / Revenue: $${formatNumber(data.revenue)} million)`);
+            } else {
+                showResult(`Sorry, no data found for ${company} in ${year}.`);
+            }
+        }
+
+        function queryCashFlow() {
+            const company = document.getElementById('cashflow-company').value;
+            
+            if (financialData[company]) {
+                let result = `<strong>${company}</strong> Cash Flow from Operations Trend:<br><br>`;
+                const years = Object.keys(financialData[company]).sort();
+                
+                years.forEach(year => {
+                    const cashFlow = financialData[company][year].cashFlow;
+                    result += `${year}: $${formatNumber(cashFlow)} million<br>`;
+                });
+                
+                if (years.length >= 2) {
+                    const latest = financialData[company][years[years.length - 1]].cashFlow;
+                    const previous = financialData[company][years[years.length - 2]].cashFlow;
+                    const change = ((latest - previous) / previous * 100).toFixed(2);
+                    result += `<br><span style="color: ${change >= 0 ? '#4caf50' : '#f44336'};">
+                        Recent change: ${change >= 0 ? '+' : ''}${change}%
+                    </span>`;
+                }
+                
+                showResult(result);
+            } else {
+                showResult(`Sorry, no cash flow data found for ${company}.`);
+            }
+        }
+    </script>
+</body>
+</html>
